@@ -5,9 +5,9 @@ const bcrypt = require("bcrypt");
 const router = new Router();
 
 router.post("/signup", (request, response, next) => {
-  const { name, email, password } = request.body;
+  const { userName, password } = request.body;
 
-  if (!name) {
+  if (!userName) {
     return response.status(400).send("You must provide a name");
   }
 
@@ -15,13 +15,8 @@ router.post("/signup", (request, response, next) => {
     return response.status(400).send("You must provide a password");
   }
 
-  if (!email) {
-    return response.status(400).send("You must provide an email");
-  }
-
   User.create({
-    name,
-    email: request.body.email,
+    userName: request.body.userName,
     password: bcrypt.hashSync(request.body.password, 10)
   })
     .then(user => response.send(user))

@@ -7,23 +7,23 @@ const bcrypt = require("bcrypt");
 const router = new Router();
 
 router.post("/login", (req, res) => {
-  const email = req.body.email;
+  const userName = req.body.userName;
   const password = req.body.password;
 
-  if (!email || !password) {
+  if (!userName || !password) {
     res.status(400).send({
       message: "Please supply a valid email and password"
     });
   } else {
     User.findOne({
       where: {
-        email: req.body.email
+        userName: req.body.userName
       }
     })
       .then(entity => {
         if (!entity) {
           res.status(400).send({
-            message: "User with that email does not exist"
+            message: "User with that username does not exist"
           });
         } else if (bcrypt.compareSync(req.body.password, entity.password)) {
           res.send({
