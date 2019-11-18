@@ -5,8 +5,8 @@ const Game = sequelize.define(
   "game",
   {
     name: {
-      type: Sequelize.STRING,
-      allowNull: false
+      type: Sequelize.STRING
+      // allowNull: false
     }
   },
   {
