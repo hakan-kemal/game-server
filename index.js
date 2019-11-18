@@ -1,11 +1,10 @@
 const express = require("express");
 const db = require("./db.js");
-const Image = require("./image/model");
-const imageRouter = require("./image/router");
 const authRouter = require("./auth/router");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const userRouter = require("./user/router");
+const gameLobbyRouter = require("./gameLobby/router");
 
 const app = express();
 
@@ -15,9 +14,9 @@ app.use(corsMiddleware);
 const parserMiddleware = bodyParser.json();
 app.use(parserMiddleware);
 
-app.use(imageRouter);
 app.use(authRouter);
 app.use(userRouter);
+app.use(gameLobbyRouter);
 
 const port = process.env.PORT || 4000;
 
