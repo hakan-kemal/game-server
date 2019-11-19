@@ -1,6 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../db");
 
+const User = require("../user/model");
+
 const Game = sequelize.define(
   "game",
   {
@@ -13,5 +15,7 @@ const Game = sequelize.define(
     tableName: "games"
   }
 );
+
+User.belongsTo(Game);
 
 module.exports = Game;
