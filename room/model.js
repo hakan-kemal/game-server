@@ -3,8 +3,8 @@ const sequelize = require("../db");
 
 const User = require("../user/model");
 
-const Game = sequelize.define(
-  "game",
+const Room = sequelize.define(
+  "room",
   {
     name: {
       type: Sequelize.STRING,
@@ -13,11 +13,11 @@ const Game = sequelize.define(
   },
   {
     timestamps: false,
-    tableName: "games"
+    tableName: "rooms"
   }
 );
 
-User.belongsTo(Game);
-Game.hasMany(User);
+User.belongsTo(Room);
+Room.hasMany(User);
 
-module.exports = Game;
+module.exports = Room;
