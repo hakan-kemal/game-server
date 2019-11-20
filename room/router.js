@@ -1,7 +1,8 @@
 const { Router } = require("express");
-const Game = require("./model");
+const Room = require("./model");
 const User = require("../user/model");
-// const auth = require("../auth/middleware");
+const auth = require("../auth/middleware");
+const { toData } = require("../auth/jwt");
 
 // const router = new Router();
 
@@ -31,9 +32,9 @@ const User = require("../user/model");
 function roomFactory(stream) {
   const router = new Router();
 
-  router.post("/room", async (request, response) => {
+  router.post("/room", async (request, response, next) => {
     console.log("IM IN!");
-    const room = await Game.create(request.body);
+    const room = await Room.create(request.body);
     console.log({ receivedRoom: room });
     const action = {
       type: "ROOM",
@@ -48,26 +49,49 @@ function roomFactory(stream) {
     response.send(room);
   });
 
-  router.put("/join/:name", async (request, response, next) => {
-    const userId = 1;
+  router.put("/join", auth, async (request, response, next) => {
+    const { user } = request;
 
-    const user = await User.findByPk(userId);
+    response.send(user);
+  });
 
-    console.log("user Id:", user);
+  router.put("/join/:name", auth, async (request, response, next) => {
+    // const { user } = request;
 
-    // If you use the auth middleware, you only need this --> const { user } = request
+    // console.log("dsamdjsadjasd", user, request);
 
-    if (!user) {
-      return next("No user found");
+    // const userId = request.user.dataValues.id;
+    // // const user = await User.findByPk(request.user.dataValues.id);
+
+    let authData;
+    const auth =
+      request.headers.authorization && request.headers.authorization.split(" ");
+    if (auth && auth[0] === "Bearer" && auth[1]) {
+      authData = toData(auth[1]);
     }
+
+    console.log("authorization data??", authData);
+    console.log("user Id:", userId);
+    console.log("data.userId:", data.userId);
+
+    const user = await User.findByPk(data.userId);
+
+    // console.log("user:", user);
+
+    // // If you use the auth middleware, you only need this --> const { user } = request
+    // // user.update(..)
+
+    // if (!user) {
+    //   return next("No user found");
+    // }
 
     const { name } = request.params;
 
-    const room = await Game.findOne({ where: { name } });
+    const room = await Room.findOne({ where: { name } });
 
     const updated = await user.update({ roomId: room.id });
 
-    const rooms = await Game.findAll({ include: [User] });
+    const rooms = await Room.findAll({ include: [User] });
 
     const action = {
       type: "ROOMS",
@@ -81,6 +105,7 @@ function roomFactory(stream) {
     response.send(updated);
   });
 
+  // use this endpoint to add points to the user?
   router.put("/points/:userId", async (request, response, next) => {
     const { userId } = request.params;
 
