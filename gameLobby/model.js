@@ -12,6 +12,7 @@ const Game = sequelize.define(
     }
   },
   {
+    timestamps: false,
     tableName: "games"
   }
 );
