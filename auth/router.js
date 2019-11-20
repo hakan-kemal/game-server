@@ -12,7 +12,7 @@ router.post("/login", (req, res) => {
 
   if (!userName || !password) {
     res.status(400).send({
-      message: "Please supply a valid email and password"
+      message: "Please supply a valid userName and password"
     });
   } else {
     User.findOne({
@@ -46,7 +46,7 @@ router.post("/login", (req, res) => {
 
 router.get("/secret-endpoint", auth, (req, res) => {
   res.send({
-    message: `Thanks for visiting the secret endpoint ${req.user.email}.`
+    message: `Thanks for visiting the secret endpoint ${req.user.userName}.`
   });
 });
 
