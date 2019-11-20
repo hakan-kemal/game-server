@@ -57,26 +57,52 @@ function roomFactory(stream) {
 
     // If you use the auth middleware, you only need this --> const { user } = request
 
+    if (!user) {
+      return next("No user found");
+    }
+
     const { name } = request.params;
 
     const room = await Game.findOne({ where: { name } });
 
     const updated = await user.update({ roomId: room.id });
 
+    const rooms = await Game.findAll({ include: [User] });
+
+    const action = {
+      type: "ROOMS",
+      payload: rooms
+    };
+
+    const string = JSON.stringify(action);
+
+    stream.send(string);
+
+    response.send(updated);
+  });
+
+  router.put("/points/:userId", async (request, response, next) => {
+    const { userId } = request.params;
+
+    const user = await User.findByPk(userId);
+
+    const updated = await user.update({ points: 1 });
+
+    const rooms = await Room.findAll({ include: [User] });
+
+    const action = {
+      type: "ROOMS",
+      payload: rooms
+    };
+
+    const string = JSON.stringify(action);
+
+    stream.send(string);
+
     response.send(updated);
   });
 
   return router;
 }
-
-// router.put("./join", async (request, response, next) => {
-//   const userId = 1;
-
-//   const user = await user.findByPk(userId);
-
-//   console.log("user Id:", user);
-
-// response.send(user)
-// });
 
 module.exports = roomFactory;

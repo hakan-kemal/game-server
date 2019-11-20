@@ -7,8 +7,8 @@ const Game = sequelize.define(
   "game",
   {
     name: {
-      type: Sequelize.STRING
-      // allowNull: false
+      type: Sequelize.STRING,
+      allowNull: false
     }
   },
   {
@@ -17,5 +17,6 @@ const Game = sequelize.define(
 );
 
 User.belongsTo(Game);
+Game.hasMany(User);
 
 module.exports = Game;

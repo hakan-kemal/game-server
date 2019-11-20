@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const userRouter = require("./user/router");
 const Game = require("./gameLobby/model");
 const Sse = require("json-sse");
-// const User = require();
+const User = require("./user/model");
 // install json-sse library --> import the json-sse in index.js (server-side)
 // 2. Make a stream; instanciate the Sse() class --> const stream = new Sse()
 // 3. To connect to the stream create a app.get('./stream ... --> stream.init (response.send is inside the stream.init) )
@@ -68,8 +68,7 @@ app.use(userRouter);
 // });
 
 app.get("/stream", async (request, response) => {
-  const rooms = await Game.findAll();
-  //{ include: [User] }
+  const rooms = await Game.findAll({ include: [User] });
 
   const action = {
     type: "ROOMS",
@@ -85,4 +84,6 @@ app.get("/stream", async (request, response) => {
 
 const port = process.env.PORT || 4000;
 
-app.listen(port, () => console.log(`listening on port ${port}!`));
+app.listen(port, () => {
+  console.log(`listening on port ${port}!`);
+});
