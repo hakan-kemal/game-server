@@ -2,32 +2,9 @@ const { Router } = require("express");
 const Room = require("./model");
 const User = require("../user/model");
 const auth = require("../auth/middleware");
-const { toData } = require("../auth/jwt");
-
-// const router = new Router();
+// const { toData } = require("../auth/jwt");
 
 // router.use(auth);
-
-// router.get("/gameLobby", auth, (req, res, next) => {
-//   Game.findAll()
-//     .then(games => res.send(games))
-//     .catch(next);
-// });
-
-// function roomFactory(stream) {
-//   const router = new Router();
-
-//   router.post("/room", (request, response) => {
-//     Game.create(request.body).then(room => {
-//       const data = JSON.stringify(room);
-
-//       stream.send(data);
-
-//       response.send(room);
-//     });
-//   });
-//   return router;
-// }
 
 function roomFactory(stream) {
   const router = new Router();
@@ -36,6 +13,7 @@ function roomFactory(stream) {
     console.log("IM IN!");
     const room = await Room.create(request.body);
     console.log({ receivedRoom: room });
+
     const action = {
       type: "ROOM",
       payload: room
@@ -45,7 +23,6 @@ function roomFactory(stream) {
 
     stream.send(string);
 
-    // just for testing
     response.send(room);
   });
 
@@ -56,34 +33,33 @@ function roomFactory(stream) {
   });
 
   router.put("/join/:name", auth, async (request, response, next) => {
-    // const { user } = request;
+    // const userId = 1
 
-    // console.log("dsamdjsadjasd", user, request);
+    //   const user = await User
+    //     .findByPk(userId)
+    const { user } = request;
 
-    // const userId = request.user.dataValues.id;
-    // // const user = await User.findByPk(request.user.dataValues.id);
-
-    let authData;
-    const auth =
-      request.headers.authorization && request.headers.authorization.split(" ");
-    if (auth && auth[0] === "Bearer" && auth[1]) {
-      authData = toData(auth[1]);
+    if (!user) {
+      return next("No user found");
     }
 
-    console.log("authorization data??", authData);
-    console.log("user Id:", userId);
-    console.log("data.userId:", data.userId);
+    // const authData;
+    // const userId = request.user.dataValues.id;
+    // const user = await User.findByPk(request.user.dataValues.id);
+    // const auth =
+    //   request.headers.authorization && request.headers.authorization.split(" ");
+    // if (auth && auth[0] === "Bearer" && auth[1]) {
+    //   authData = toData(auth[1]);
+    // }
+    // console.log("authorization data??", authData);
 
-    const user = await User.findByPk(data.userId);
+    // const user = await User.findByPk(data.userId);
 
-    // console.log("user:", user);
-
+    // console.log("user Id:", userId);
+    // console.log("data.userId:", data.userId);
+    // const user = await User.findByPk(data.userId);
     // // If you use the auth middleware, you only need this --> const { user } = request
     // // user.update(..)
-
-    // if (!user) {
-    //   return next("No user found");
-    // }
 
     const { name } = request.params;
 
@@ -106,25 +82,34 @@ function roomFactory(stream) {
   });
 
   // use this endpoint to add points to the user?
-  router.put("/points/:userId", async (request, response, next) => {
-    const { userId } = request.params;
+  // router.put("/points/:username", async (request, response, next) => {
+  // const { username } = request.params;
+  router.put("/points", async (request, response, next) => {
+    const { username } = request.body; //if you want your url to be just /points
 
-    const user = await User.findByPk(userId);
+    try {
+      // const user = await User.findByPk(userId);
+      const user = await User.findOne({ where: { userName: username } });
 
-    const updated = await user.update({ points: 1 });
+      const startingPoints = user.points + 100;
 
-    const rooms = await Room.findAll({ include: [User] });
+      const updated = await user.update({ points: startingPoints - 1 });
 
-    const action = {
-      type: "ROOMS",
-      payload: rooms
-    };
+      const rooms = await Room.findAll({ include: [User] });
 
-    const string = JSON.stringify(action);
+      const action = {
+        type: "ROOMS",
+        payload: rooms
+      };
 
-    stream.send(string);
+      const string = JSON.stringify(action);
 
-    response.send(updated);
+      stream.send(string);
+
+      response.send(updated);
+    } catch (error) {
+      next(error);
+    }
   });
 
   return router;
