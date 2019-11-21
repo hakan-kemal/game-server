@@ -8,6 +8,9 @@ function auth(req, res, next) {
     try {
       const data = toData(auth[1]);
       User.findByPk(data.userId)
+        // console.log("data variable from middleware.js", data);
+        // console
+        //   .log("data.userId from middleware.js", data.userId)
         .then(user => {
           if (!user) return next("User does not exist");
 
