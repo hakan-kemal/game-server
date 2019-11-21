@@ -16,6 +16,7 @@ const User = sequelize.define(
     },
     points: {
       type: Sequelize.INTEGER
+      // allowNull: false
     }
   },
   {

@@ -2,7 +2,7 @@ const { Router } = require("express");
 const Room = require("./model");
 const User = require("../user/model");
 const auth = require("../auth/middleware");
-// const { toData } = require("../auth/jwt");
+const { toData } = require("../auth/jwt");
 
 // router.use(auth);
 
@@ -91,7 +91,7 @@ function roomFactory(stream) {
       // const user = await User.findByPk(userId);
       const user = await User.findOne({ where: { userName: username } });
 
-      const startingPoints = user.points + 100;
+      const startingPoints = user.points;
 
       const updated = await user.update({ points: startingPoints - 1 });
 
