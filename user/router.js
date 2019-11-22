@@ -25,4 +25,13 @@ router.post("/signup", (request, response, next) => {
     .catch(next);
 });
 
+router.get("/signup", (request, response, next) => {
+  console.log("connected to get users");
+  User.findAll()
+    .then(users => {
+      response.send(users);
+    })
+    .catch(next);
+});
+
 module.exports = router;
