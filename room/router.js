@@ -84,16 +84,15 @@ function roomFactory(stream) {
   // use this endpoint to add points to the user?
   // router.put("/points/:username", async (request, response, next) => {
   // const { username } = request.params;
-  router.put("/points", async (request, response, next) => {
-    const { username } = request.body; //if you want your url to be just /points
+  router.put("/points", auth, async (request, response, next) => {
+    const { user } = request;
+    const { points } = request.body; //if you want your url to be just /points
 
     try {
       // const user = await User.findByPk(userId);
-      const user = await User.findOne({ where: { userName: username } });
+      const oldPoints = user.points;
 
-      const startingPoints = user.points;
-
-      const updated = await user.update({ points: startingPoints - 1 });
+      const updated = await user.update({ points: oldPoints + points });
 
       const rooms = await Room.findAll({ include: [User] });
 
