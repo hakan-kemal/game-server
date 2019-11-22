@@ -14,9 +14,11 @@ function roomFactory(stream) {
     const room = await Room.create(request.body);
     console.log({ receivedRoom: room });
 
+    const rooms = await Room.findAll({ include: [User] });
+
     const action = {
-      type: "ROOM",
-      payload: room
+      type: "ROOMS",
+      payload: rooms
     };
 
     const string = JSON.stringify(action);
